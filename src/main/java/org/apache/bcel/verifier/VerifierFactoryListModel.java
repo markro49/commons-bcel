@@ -22,14 +22,17 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * This class implements an adapter; it implements both a Swing ListModel and a VerifierFactoryObserver.
  *
  */
-public class VerifierFactoryListModel implements VerifierFactoryObserver, javax.swing.ListModel<String> {
+public class VerifierFactoryListModel implements VerifierFactoryObserver, ListModel<String> {
 
     private final List<ListDataListener> listeners = new ArrayList<>();
     private final Set<String> cache = new TreeSet<>();
@@ -37,6 +40,26 @@ public class VerifierFactoryListModel implements VerifierFactoryObserver, javax.
     public VerifierFactoryListModel() {
         VerifierFactory.attach(this);
         update(null); // fill cache.
+    }
+
+    @Override
+    public synchronized void addListDataListener(final ListDataListener l) {
+        listeners.add(l);
+    }
+
+    @Override
+    public synchronized String getElementAt(final int index) {
+        return cache.toArray(ArrayUtils.EMPTY_STRING_ARRAY)[index];
+    }
+
+    @Override
+    public synchronized int getSize() {
+        return cache.size();
+    }
+
+    @Override
+    public synchronized void removeListDataListener(final ListDataListener l) {
+        listeners.remove(l);
     }
 
     @Override
@@ -48,29 +71,8 @@ public class VerifierFactoryListModel implements VerifierFactoryObserver, javax.
             cache.add(verifier.getClassName());
         }
         for (final ListDataListener listener : listeners) {
-            final ListDataEvent e = new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, num_of_verifiers - 1);
-            listener.contentsChanged(e);
+            listener.contentsChanged(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, num_of_verifiers - 1));
         }
-    }
-
-    @Override
-    public synchronized void addListDataListener(final ListDataListener l) {
-        listeners.add(l);
-    }
-
-    @Override
-    public synchronized void removeListDataListener(final javax.swing.event.ListDataListener l) {
-        listeners.remove(l);
-    }
-
-    @Override
-    public synchronized int getSize() {
-        return cache.size();
-    }
-
-    @Override
-    public synchronized String getElementAt(final int index) {
-        return cache.toArray(new String[cache.size()])[index];
     }
 
 }

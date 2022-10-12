@@ -33,9 +33,9 @@ public class AnnotationDefault extends Attribute {
     private ElementValue defaultValue;
 
     /**
-     * @param name_index    Index pointing to the name <em>Code</em>
-     * @param length        Content length in bytes
-     * @param input         Input stream
+     * @param name_index Index pointing to the name <em>Code</em>
+     * @param length Content length in bytes
+     * @param input Input stream
      * @param constant_pool Array of constants
      */
     AnnotationDefault(final int name_index, final int length, final DataInput input, final ConstantPool constant_pool) throws IOException {
@@ -44,9 +44,9 @@ public class AnnotationDefault extends Attribute {
     }
 
     /**
-     * @param name_index    Index pointing to the name <em>Code</em>
-     * @param length        Content length in bytes
-     * @param defaultValue  the annotation's default value
+     * @param name_index Index pointing to the name <em>Code</em>
+     * @param length Content length in bytes
+     * @param defaultValue the annotation's default value
      * @param constant_pool Array of constants
      */
     public AnnotationDefault(final int name_index, final int length, final ElementValue defaultValue, final ConstantPool constant_pool) {
@@ -55,9 +55,8 @@ public class AnnotationDefault extends Attribute {
     }
 
     /**
-     * Called by objects that are traversing the nodes of the tree implicitely
-     * defined by the contents of a Java class. I.e., the hierarchy of methods,
-     * fields, attributes, etc. spawns a tree of objects.
+     * Called by objects that are traversing the nodes of the tree implicitly defined by the contents of a Java class.
+     * I.e., the hierarchy of methods, fields, attributes, etc. spawns a tree of objects.
      *
      * @param v Visitor object
      */
@@ -66,11 +65,15 @@ public class AnnotationDefault extends Attribute {
         v.visitAnnotationDefault(this);
     }
 
-    /**
-     * @param defaultValue the default value of this methodinfo's annotation
-     */
-    public final void setDefaultValue(final ElementValue defaultValue) {
-        this.defaultValue = defaultValue;
+    @Override
+    public Attribute copy(final ConstantPool constantPool) {
+        return (Attribute) clone();
+    }
+
+    @Override
+    public final void dump(final DataOutputStream dos) throws IOException {
+        super.dump(dos);
+        defaultValue.dump(dos);
     }
 
     /**
@@ -80,14 +83,10 @@ public class AnnotationDefault extends Attribute {
         return defaultValue;
     }
 
-    @Override
-    public Attribute copy(final ConstantPool _constant_pool) {
-        return (Attribute) clone();
-    }
-
-    @Override
-    public final void dump(final DataOutputStream dos) throws IOException {
-        super.dump(dos);
-        defaultValue.dump(dos);
+    /**
+     * @param defaultValue the default value of this methodinfo's annotation
+     */
+    public final void setDefaultValue(final ElementValue defaultValue) {
+        this.defaultValue = defaultValue;
     }
 }

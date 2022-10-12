@@ -26,12 +26,10 @@ import org.apache.bcel.classfile.ConstantPool;
 public abstract class FieldInstruction extends FieldOrMethod {
 
     /**
-     * Empty constructor needed for Instruction.readInstruction.
-     * Not to be used otherwise.
+     * Empty constructor needed for Instruction.readInstruction. Not to be used otherwise.
      */
     FieldInstruction() {
     }
-
 
     /**
      * @param index to constant pool
@@ -40,42 +38,40 @@ public abstract class FieldInstruction extends FieldOrMethod {
         super(opcode, index);
     }
 
+    /**
+     * @return name of referenced field.
+     */
+    public String getFieldName(final ConstantPoolGen cpg) {
+        return getName(cpg);
+    }
+
+    /**
+     * @return size of field (1 or 2)
+     */
+    protected int getFieldSize(final ConstantPoolGen cpg) {
+        return Type.size(Type.getTypeSize(getSignature(cpg)));
+    }
+
+    /**
+     * @return type of field
+     */
+    public Type getFieldType(final ConstantPoolGen cpg) {
+        return Type.getType(getSignature(cpg));
+    }
+
+    /**
+     * @return return type of referenced field
+     */
+    @Override
+    public Type getType(final ConstantPoolGen cpg) {
+        return getFieldType(cpg);
+    }
 
     /**
      * @return mnemonic for instruction with symbolic references resolved
      */
     @Override
-    public String toString( final ConstantPool cp ) {
-        return org.apache.bcel.Const.getOpcodeName(super.getOpcode()) + " "
-                + cp.constantToString(super.getIndex(), org.apache.bcel.Const.CONSTANT_Fieldref);
-    }
-
-
-    /** @return size of field (1 or 2)
-     */
-    protected int getFieldSize( final ConstantPoolGen cpg ) {
-        return Type.size(Type.getTypeSize(getSignature(cpg)));
-    }
-
-
-    /** @return return type of referenced field
-     */
-    @Override
-    public Type getType( final ConstantPoolGen cpg ) {
-        return getFieldType(cpg);
-    }
-
-
-    /** @return type of field
-     */
-    public Type getFieldType( final ConstantPoolGen cpg ) {
-        return Type.getType(getSignature(cpg));
-    }
-
-
-    /** @return name of referenced field.
-     */
-    public String getFieldName( final ConstantPoolGen cpg ) {
-        return getName(cpg);
+    public String toString(final ConstantPool cp) {
+        return org.apache.bcel.Const.getOpcodeName(super.getOpcode()) + " " + cp.constantToString(super.getIndex(), org.apache.bcel.Const.CONSTANT_Fieldref);
     }
 }
