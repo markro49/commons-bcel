@@ -17,7 +17,6 @@
  */
 package org.apache.bcel.verifier.structurals;
 
-
 import java.util.ArrayList;
 
 import org.apache.bcel.generic.ObjectType;
@@ -27,8 +26,7 @@ import org.apache.bcel.verifier.exc.AssertionViolatedException;
 import org.apache.bcel.verifier.exc.StructuralCodeConstraintException;
 
 /**
- * This class implements a stack used for symbolic JVM stack simulation.
- * [It's used an an operand stack substitute.]
+ * This class implements a stack used for symbolic JVM stack simulation. [It's used as an operand stack substitute.]
  * Elements of this stack are {@link Type} objects.
  *
  */
@@ -48,17 +46,23 @@ public class OperandStack implements Cloneable {
     }
 
     /**
-     * Creates an otherwise empty stack with a maximum of maxStack slots and
-     * the ObjectType 'obj' at the top.
+     * Creates an otherwise empty stack with a maximum of maxStack slots and the ObjectType 'obj' at the top.
      */
     public OperandStack(final int maxStack, final ObjectType obj) {
         this.maxStack = maxStack;
         this.push(obj);
     }
+
     /**
-     * Returns a deep copy of this object; that means, the clone operates
-     * on a new stack. However, the Type objects on the stack are
-     * shared.
+     * Clears the stack.
+     */
+    public void clear() {
+        stack = new ArrayList<>();
+    }
+
+    /**
+     * Returns a deep copy of this object; that means, the clone operates on a new stack. However, the Type objects on the
+     * stack are shared.
      */
     @Override
     public Object clone() {
@@ -70,21 +74,7 @@ public class OperandStack implements Cloneable {
     }
 
     /**
-     * Clears the stack.
-     */
-    public void clear() {
-        stack = new ArrayList<>();
-    }
-
-    /** @return a hash code value for the object.
-     */
-    @Override
-    public int hashCode() { return stack.hashCode(); }
-
-    /**
-     * Returns true if and only if this OperandStack
-     * equals another, meaning equal lengths and equal
-     * objects on the stacks.
+     * Returns true if and only if this OperandStack equals another, meaning equal lengths and equal objects on the stacks.
      */
     @Override
     public boolean equals(final Object o) {
@@ -105,8 +95,27 @@ public class OperandStack implements Cloneable {
     }
 
     /**
+     * @return a hash code value for the object.
+     */
+    @Override
+    public int hashCode() {
+        return stack.hashCode();
+    }
+
+    /**
+     * Replaces all occurences of u in this OperandStack instance with an "initialized" ObjectType.
+     */
+    public void initializeObject(final UninitializedObjectType u) {
+        for (int i = 0; i < stack.size(); i++) {
+            if (stack.get(i) == u) {
+                stack.set(i, u.getInitialized());
+            }
+        }
+    }
+
+    /**
      * Returns true IFF this OperandStack is empty.
-   */
+     */
     public boolean isEmpty() {
         return stack.isEmpty();
     }
@@ -119,6 +128,46 @@ public class OperandStack implements Cloneable {
     }
 
     /**
+     * Merges another stack state into this instance's stack state. See the Java Virtual Machine Specification, Second
+     * Edition, page 146: 4.9.2 for details.
+     */
+    public void merge(final OperandStack s) {
+        try {
+            if (slotsUsed() != s.slotsUsed() || size() != s.size()) {
+                throw new StructuralCodeConstraintException("Cannot merge stacks of different size:\nOperandStack A:\n" + this + "\nOperandStack B:\n" + s);
+            }
+
+            for (int i = 0; i < size(); i++) {
+                // If the object _was_ initialized and we're supposed to merge
+                // in some uninitialized object, we reject the code (see vmspec2, 4.9.4, last paragraph).
+                if (!(stack.get(i) instanceof UninitializedObjectType) && s.stack.get(i) instanceof UninitializedObjectType) {
+                    throw new StructuralCodeConstraintException("Backwards branch with an uninitialized object on the stack detected.");
+                }
+                // Even harder, we're not initialized but are supposed to broaden
+                // the known object type
+                if (!stack.get(i).equals(s.stack.get(i)) && stack.get(i) instanceof UninitializedObjectType
+                    && !(s.stack.get(i) instanceof UninitializedObjectType)) {
+                    throw new StructuralCodeConstraintException("Backwards branch with an uninitialized object on the stack detected.");
+                }
+                // on the other hand...
+                if (stack.get(i) instanceof UninitializedObjectType && !(s.stack.get(i) instanceof UninitializedObjectType)) { // that has been initialized by
+                                                                                                                               // now
+                    stack.set(i, ((UninitializedObjectType) stack.get(i)).getInitialized()); // note that.
+                }
+                if (!stack.get(i).equals(s.stack.get(i))) {
+                    if (!(stack.get(i) instanceof ReferenceType) || !(s.stack.get(i) instanceof ReferenceType)) {
+                        throw new StructuralCodeConstraintException("Cannot merge stacks of different types:\nStack A:\n" + this + "\nStack B:\n" + s);
+                    }
+                    stack.set(i, ((ReferenceType) stack.get(i)).getFirstCommonSuperclass((ReferenceType) s.stack.get(i)));
+                }
+            }
+        } catch (final ClassNotFoundException e) {
+            // FIXME: maybe not the best way to handle this
+            throw new AssertionViolatedException("Missing class: " + e, e);
+        }
+    }
+
+    /**
      * Returns the element on top of the stack. The element is not popped off the stack!
      */
     public Type peek() {
@@ -126,26 +175,27 @@ public class OperandStack implements Cloneable {
     }
 
     /**
-   * Returns the element that's i elements below the top element; that means,
-   * iff i==0 the top element is returned. The element is not popped off the stack!
-   */
+     * Returns the element that's i elements below the top element; that means, iff i==0 the top element is returned. The
+     * element is not popped off the stack!
+     */
     public Type peek(final int i) {
-        return stack.get(size()-i-1);
+        return stack.get(size() - i - 1);
     }
 
     /**
      * Returns the element on top of the stack. The element is popped off the stack.
      */
     public Type pop() {
-        final Type e = stack.remove(size()-1);
-        return e;
+        return stack.remove(size() - 1);
     }
 
     /**
-     * Pops i elements off the stack. ALWAYS RETURNS "null"!!!
+     * Pops i elements off the stack. Always returns null.
+     *
+     * @return Always returns null.
      */
-    public Type pop(final int i) {
-        for (int j=0; j<i; j++) {
+    public Type pop(final int count) {
+        for (int j = 0; j < count; j++) {
             pop();
         }
         return null;
@@ -159,11 +209,10 @@ public class OperandStack implements Cloneable {
             throw new AssertionViolatedException("Cannot push NULL onto OperandStack.");
         }
         if (type == Type.BOOLEAN || type == Type.CHAR || type == Type.BYTE || type == Type.SHORT) {
-            throw new AssertionViolatedException("The OperandStack does not know about '"+type+"'; use Type.INT instead.");
+            throw new AssertionViolatedException("The OperandStack does not know about '" + type + "'; use Type.INT instead.");
         }
         if (slotsUsed() >= maxStack) {
-            throw new AssertionViolatedException(
-                "OperandStack too small, should have thrown proper Exception elsewhere. Stack: "+this);
+            throw new AssertionViolatedException("OperandStack too small, should have thrown proper Exception elsewhere. Stack: " + this);
         }
         stack.add(type);
     }
@@ -177,15 +226,16 @@ public class OperandStack implements Cloneable {
 
     /**
      * Returns the number of stack slots used.
+     *
      * @see #maxStack()
      */
     public int slotsUsed() {
-        /*  XXX change this to a better implementation using a variable
-            that keeps track of the actual slotsUsed()-value monitoring
-            all push()es and pop()s.
-        */
+        /*
+         * XXX change this to a better implementation using a variable that keeps track of the actual slotsUsed()-value
+         * monitoring all push()es and pop()s.
+         */
         int slots = 0;
-        for (int i=0; i<stack.size(); i++) {
+        for (int i = 0; i < stack.size(); i++) {
             slots += peek(i).getSize();
         }
         return slots;
@@ -202,72 +252,13 @@ public class OperandStack implements Cloneable {
         sb.append(" MaxStack: ");
         sb.append(maxStack);
         sb.append(".\n");
-        for (int i=0; i<size(); i++) {
+        for (int i = 0; i < size(); i++) {
             sb.append(peek(i));
             sb.append(" (Size: ");
             sb.append(String.valueOf(peek(i).getSize()));
             sb.append(")\n");
         }
         return sb.toString();
-    }
-
-    /**
-     * Merges another stack state into this instance's stack state.
-     * See the Java Virtual Machine Specification, Second Edition, page 146: 4.9.2
-     * for details.
-     */
-    public void merge(final OperandStack s) {
-        try {
-        if ( (slotsUsed() != s.slotsUsed()) || (size() != s.size()) ) {
-            throw new StructuralCodeConstraintException(
-                "Cannot merge stacks of different size:\nOperandStack A:\n"+this+"\nOperandStack B:\n"+s);
-        }
-
-        for (int i=0; i<size(); i++) {
-            // If the object _was_ initialized and we're supposed to merge
-            // in some uninitialized object, we reject the code (see vmspec2, 4.9.4, last paragraph).
-            if ( (! (stack.get(i) instanceof UninitializedObjectType)) && (s.stack.get(i) instanceof UninitializedObjectType) ) {
-                throw new StructuralCodeConstraintException("Backwards branch with an uninitialized object on the stack detected.");
-            }
-            // Even harder, we're not initialized but are supposed to broaden
-            // the known object type
-            if ( (!(stack.get(i).equals(s.stack.get(i)))) &&
-                    (stack.get(i) instanceof UninitializedObjectType) && (!(s.stack.get(i) instanceof UninitializedObjectType))) {
-                throw new StructuralCodeConstraintException("Backwards branch with an uninitialized object on the stack detected.");
-            }
-            // on the other hand...
-            if (stack.get(i) instanceof UninitializedObjectType) { //if we have an uninitialized object here
-                if (! (s.stack.get(i) instanceof UninitializedObjectType)) { //that has been initialized by now
-                    stack.set(i, ((UninitializedObjectType) (stack.get(i))).getInitialized() ); //note that.
-                }
-            }
-            if (! stack.get(i).equals(s.stack.get(i))) {
-                if (    (stack.get(i) instanceof ReferenceType) &&
-                            (s.stack.get(i) instanceof ReferenceType)  ) {
-                    stack.set(i, ((ReferenceType) stack.get(i)).getFirstCommonSuperclass((ReferenceType) (s.stack.get(i))));
-                }
-                else{
-                    throw new StructuralCodeConstraintException(
-                        "Cannot merge stacks of different types:\nStack A:\n"+this+"\nStack B:\n"+s);
-                }
-            }
-        }
-        } catch (final ClassNotFoundException e) {
-        // FIXME: maybe not the best way to handle this
-        throw new AssertionViolatedException("Missing class: " + e, e);
-        }
-    }
-
-    /**
-     * Replaces all occurences of u in this OperandStack instance
-     * with an "initialized" ObjectType.
-     */
-    public void initializeObject(final UninitializedObjectType u) {
-        for (int i=0; i<stack.size(); i++) {
-            if (stack.get(i) == u) {
-                stack.set(i, u.getInitialized());
-            }
-        }
     }
 
 }
