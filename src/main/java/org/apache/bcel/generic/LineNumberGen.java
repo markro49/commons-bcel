@@ -13,7 +13,6 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *
  */
 package org.apache.bcel.generic;
 
@@ -40,9 +39,9 @@ public class LineNumberGen implements InstructionTargeter, Cloneable {
      *
      * @param ih instruction handle to reference
      */
-    public LineNumberGen(final InstructionHandle ih, final int src_line) {
+    public LineNumberGen(final InstructionHandle ih, final int srcLine) {
         setInstruction(ih);
-        setSourceLine(src_line);
+        setSourceLine(srcLine);
     }
 
     @Override
@@ -86,19 +85,19 @@ public class LineNumberGen implements InstructionTargeter, Cloneable {
         this.ih = instructionHandle;
     }
 
-    public void setSourceLine(final int src_line) { // TODO could be package-protected?
-        this.srcLine = src_line;
+    public void setSourceLine(final int srcLine) { // TODO could be package-protected?
+        this.srcLine = srcLine;
     }
 
     /**
-     * @param old_ih old target
-     * @param new_ih new target
+     * @param oldIh old target
+     * @param newIh new target
      */
     @Override
-    public void updateTarget(final InstructionHandle old_ih, final InstructionHandle new_ih) {
-        if (old_ih != ih) {
-            throw new ClassGenException("Not targeting " + old_ih + ", but " + ih + "}");
+    public void updateTarget(final InstructionHandle oldIh, final InstructionHandle newIh) {
+        if (oldIh != ih) {
+            throw new ClassGenException("Not targeting " + oldIh + ", but " + ih + "}");
         }
-        setInstruction(new_ih);
+        setInstruction(newIh);
     }
 }

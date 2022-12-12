@@ -13,7 +13,6 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *
  */
 package org.apache.bcel.generic;
 
@@ -154,7 +153,7 @@ public abstract class Select extends BranchInstruction implements VariableLength
      * @return the fixed_length
      * @since 6.0
      */
-    final int getFixed_length() {
+    final int getFixedLength() {
         return fixed_length;
     }
 
@@ -185,7 +184,7 @@ public abstract class Select extends BranchInstruction implements VariableLength
      * @return the match_length
      * @since 6.0
      */
-    final int getMatch_length() {
+    final int getMatchLength() {
         return match_length;
     }
 
@@ -234,11 +233,11 @@ public abstract class Select extends BranchInstruction implements VariableLength
     }
 
     /**
-     * @param fixed_length the fixed_length to set
+     * @param fixedLength the fixed_length to set
      * @since 6.0
      */
-    final void setFixed_length(final int fixed_length) {
-        this.fixed_length = fixed_length;
+    final void setFixedLength(final int fixedLength) {
+        this.fixed_length = fixedLength;
     }
 
     /** @since 6.0 */
@@ -267,12 +266,12 @@ public abstract class Select extends BranchInstruction implements VariableLength
     }
 
     /**
-     * @param match_length the match_length to set
+     * @param matchLength the match_length to set
      * @since 6.0
      */
-    final int setMatch_length(final int match_length) {
-        this.match_length = match_length;
-        return match_length;
+    final int setMatchLength(final int matchLength) {
+        this.match_length = matchLength;
+        return matchLength;
     }
 
     /**
@@ -330,40 +329,40 @@ public abstract class Select extends BranchInstruction implements VariableLength
      * positions and offsets by calling this function.
      *
      * @param offset additional offset caused by preceding (variable length) instructions
-     * @param max_offset the maximum offset that may be caused by these instructions
+     * @param maxOffset the maximum offset that may be caused by these instructions
      * @return additional offset caused by possible change of this instruction's length
      */
     @Override
-    protected int updatePosition(final int offset, final int max_offset) {
+    protected int updatePosition(final int offset, final int maxOffset) {
         setPosition(getPosition() + offset); // Additional offset caused by preceding SWITCHs, GOTOs, etc.
-        final short old_length = (short) super.getLength();
+        final short oldLength = (short) super.getLength();
         /*
          * Alignment on 4-byte-boundary, + 1, because of tag byte.
          */
         padding = (4 - (getPosition() + 1) % 4) % 4;
         super.setLength((short) (fixed_length + padding)); // Update length
-        return super.getLength() - old_length;
+        return super.getLength() - oldLength;
     }
 
     /**
-     * @param old_ih old target
-     * @param new_ih new target
+     * @param oldIh old target
+     * @param newIh new target
      */
     @Override
-    public void updateTarget(final InstructionHandle old_ih, final InstructionHandle new_ih) {
+    public void updateTarget(final InstructionHandle oldIh, final InstructionHandle newIh) {
         boolean targeted = false;
-        if (super.getTarget() == old_ih) {
+        if (super.getTarget() == oldIh) {
             targeted = true;
-            setTarget(new_ih);
+            setTarget(newIh);
         }
         for (int i = 0; i < targets.length; i++) {
-            if (targets[i] == old_ih) {
+            if (targets[i] == oldIh) {
                 targeted = true;
-                setTarget(i, new_ih);
+                setTarget(i, newIh);
             }
         }
         if (!targeted) {
-            throw new ClassGenException("Not targeting " + old_ih);
+            throw new ClassGenException("Not targeting " + oldIh);
         }
     }
 }

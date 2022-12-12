@@ -13,9 +13,10 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *
  */
 package org.apache.bcel.verifier.statics;
+
+import java.util.Arrays;
 
 import org.apache.bcel.Const;
 import org.apache.bcel.Repository;
@@ -120,7 +121,7 @@ public final class Pass3aVerifier extends PassVerifier {
         }
 
         /**
-         * A utility method to always raise an exeption.
+         * A utility method to always raise an exception.
          */
         private void constraintViolated(final Instruction i, final String message) {
             throw new StaticCodeInstructionOperandConstraintException("Instruction " + tostring(i) + " constraint violated: " + message);
@@ -138,7 +139,7 @@ public final class Pass3aVerifier extends PassVerifier {
             for (final Method element : ms) {
                 if (element.getName().equals(invoke.getMethodName(constantPoolGen))
                     && Type.getReturnType(element.getSignature()).equals(invoke.getReturnType(constantPoolGen))
-                    && objarrayequals(Type.getArgumentTypes(element.getSignature()), invoke.getArgumentTypes(constantPoolGen))) {
+                    && Arrays.equals(Type.getArgumentTypes(element.getSignature()), invoke.getArgumentTypes(constantPoolGen))) {
                     return element;
                 }
             }
@@ -210,31 +211,13 @@ public final class Pass3aVerifier extends PassVerifier {
         /**
          * Utility method to return the max_locals value of the method verified by the surrounding Pass3aVerifier instance.
          */
-        private int max_locals() {
+        private int maxLocals() {
             try {
                 return Repository.lookupClass(myOwner.getClassName()).getMethods()[methodNo].getCode().getMaxLocals();
             } catch (final ClassNotFoundException e) {
                 // FIXME: maybe not the best way to handle this
                 throw new AssertionViolatedException("Missing class: " + e, e);
             }
-        }
-
-        /**
-         * A utility method like equals(Object) for arrays. The equality of the elements is based on their equals(Object) method
-         * instead of their object identity.
-         */
-        private boolean objarrayequals(final Object[] o, final Object[] p) {
-            if (o.length != p.length) {
-                return false;
-            }
-
-            for (int i = 0; i < o.length; i++) {
-                if (!o[i].equals(p[i])) {
-                    return false;
-                }
-            }
-
-            return true;
         }
 
         /** Checks if the constraints of operands of the said instruction(s) are satisfied. */
@@ -244,7 +227,7 @@ public final class Pass3aVerifier extends PassVerifier {
             if (idx < 0) {
                 constraintViolated(o, "Index '" + idx + "' must be non-negative.");
             } else {
-                final int maxminus1 = max_locals() - 1;
+                final int maxminus1 = maxLocals() - 1;
                 if (idx > maxminus1) {
                     constraintViolated(o, "Index '" + idx + "' must not be greater than max_locals-1 '" + maxminus1 + "'.");
                 }
@@ -276,7 +259,7 @@ public final class Pass3aVerifier extends PassVerifier {
             if (idx < 0) {
                 constraintViolated(o, "Index '" + idx + "' must be non-negative.");
             } else {
-                final int maxminus1 = max_locals() - 1;
+                final int maxminus1 = maxLocals() - 1;
                 if (idx > maxminus1) {
                     constraintViolated(o, "Index '" + idx + "' must not be greater than max_locals-1 '" + maxminus1 + "'.");
                 }
@@ -301,7 +284,7 @@ public final class Pass3aVerifier extends PassVerifier {
                 constraintViolated(o, "Index '" + idx + "' must be non-negative."
                     + " [Constraint by JustIce as an analogon to the single-slot xLOAD/xSTORE instructions; may not happen anyway.]");
             } else {
-                final int maxminus2 = max_locals() - 2;
+                final int maxminus2 = maxLocals() - 2;
                 if (idx > maxminus2) {
                     constraintViolated(o, "Index '" + idx + "' must not be greater than max_locals-2 '" + maxminus2 + "'.");
                 }
@@ -316,7 +299,7 @@ public final class Pass3aVerifier extends PassVerifier {
                 constraintViolated(o, "Index '" + idx + "' must be non-negative."
                     + " [Constraint by JustIce as an analogon to the single-slot xLOAD/xSTORE instructions; may not happen anyway.]");
             } else {
-                final int maxminus2 = max_locals() - 2;
+                final int maxminus2 = maxLocals() - 2;
                 if (idx > maxminus2) {
                     constraintViolated(o, "Index '" + idx + "' must not be greater than max_locals-2 '" + maxminus2 + "'.");
                 }
@@ -334,13 +317,13 @@ public final class Pass3aVerifier extends PassVerifier {
                     constraintViolated(o, "Indexing a constant that's not a CONSTANT_Fieldref but a '" + tostring(c) + "'.");
                 }
 
-                final String field_name = o.getFieldName(constantPoolGen);
+                final String fieldName = o.getFieldName(constantPoolGen);
 
                 final JavaClass jc = Repository.lookupClass(getObjectType(o).getClassName());
                 Field[] fields = jc.getFields();
                 Field f = null;
                 for (final Field field : fields) {
-                    if (field.getName().equals(field_name)) {
+                    if (field.getName().equals(fieldName)) {
                         final Type fType = Type.getType(field.getSignature());
                         final Type oType = o.getType(constantPoolGen);
                         /*
@@ -357,7 +340,7 @@ public final class Pass3aVerifier extends PassVerifier {
                     outer: for (final JavaClass superclass : superclasses) {
                         fields = superclass.getFields();
                         for (final Field field : fields) {
-                            if (field.getName().equals(field_name)) {
+                            if (field.getName().equals(fieldName)) {
                                 final Type fType = Type.getType(field.getSignature());
                                 final Type oType = o.getType(constantPoolGen);
                                 if (fType.equals(oType)) {
@@ -371,7 +354,7 @@ public final class Pass3aVerifier extends PassVerifier {
                         }
                     }
                     if (f == null) {
-                        constraintViolated(o, "Referenced field '" + field_name + "' does not exist in class '" + jc.getClassName() + "'.");
+                        constraintViolated(o, "Referenced field '" + fieldName + "' does not exist in class '" + jc.getClassName() + "'.");
                     }
                 } else {
                     /*
@@ -404,7 +387,7 @@ public final class Pass3aVerifier extends PassVerifier {
             if (idx < 0) {
                 constraintViolated(o, "Index '" + idx + "' must be non-negative.");
             } else {
-                final int maxminus1 = max_locals() - 1;
+                final int maxminus1 = maxLocals() - 1;
                 if (idx > maxminus1) {
                     constraintViolated(o, "Index '" + idx + "' must not be greater than max_locals-1 '" + maxminus1 + "'.");
                 }
@@ -418,7 +401,7 @@ public final class Pass3aVerifier extends PassVerifier {
             if (idx < 0) {
                 constraintViolated(o, "Index '" + idx + "' must be non-negative.");
             } else {
-                final int maxminus1 = max_locals() - 1;
+                final int maxminus1 = maxLocals() - 1;
                 if (idx > maxminus1) {
                     constraintViolated(o, "Index '" + idx + "' must not be greater than max_locals-1 '" + maxminus1 + "'.");
                 }
@@ -429,18 +412,18 @@ public final class Pass3aVerifier extends PassVerifier {
         @Override
         public void visitGETSTATIC(final GETSTATIC o) {
             try {
-                final String field_name = o.getFieldName(constantPoolGen);
+                final String fieldName = o.getFieldName(constantPoolGen);
                 final JavaClass jc = Repository.lookupClass(getObjectType(o).getClassName());
                 final Field[] fields = jc.getFields();
                 Field f = null;
                 for (final Field field : fields) {
-                    if (field.getName().equals(field_name)) {
+                    if (field.getName().equals(fieldName)) {
                         f = field;
                         break;
                     }
                 }
                 if (f == null) {
-                    throw new AssertionViolatedException("Field '" + field_name + "' not found in " + jc.getClassName());
+                    throw new AssertionViolatedException("Field '" + fieldName + "' not found in " + jc.getClassName());
                 }
 
                 if (!f.isStatic()) {
@@ -459,7 +442,7 @@ public final class Pass3aVerifier extends PassVerifier {
             if (idx < 0) {
                 constraintViolated(o, "Index '" + idx + "' must be non-negative.");
             } else {
-                final int maxminus1 = max_locals() - 1;
+                final int maxminus1 = maxLocals() - 1;
                 if (idx > maxminus1) {
                     constraintViolated(o, "Index '" + idx + "' must not be greater than max_locals-1 '" + maxminus1 + "'.");
                 }
@@ -473,7 +456,7 @@ public final class Pass3aVerifier extends PassVerifier {
             if (idx < 0) {
                 constraintViolated(o, "Index '" + idx + "' must be non-negative.");
             } else {
-                final int maxminus1 = max_locals() - 1;
+                final int maxminus1 = maxLocals() - 1;
                 if (idx > maxminus1) {
                     constraintViolated(o, "Index '" + idx + "' must not be greater than max_locals-1 '" + maxminus1 + "'.");
                 }
@@ -576,8 +559,8 @@ public final class Pass3aVerifier extends PassVerifier {
                 // is therefore resolved/verified.
                 // INVOKEINTERFACE is an InvokeInstruction, the argument and return types are resolved/verified,
                 // too. So are the allowed method names.
-                final String classname = o.getClassName(constantPoolGen);
-                final JavaClass jc = Repository.lookupClass(classname);
+                final String className = o.getClassName(constantPoolGen);
+                final JavaClass jc = Repository.lookupClass(className);
                 final Method m = getMethodRecursive(jc, o);
                 if (m == null) {
                     constraintViolated(o, "Referenced method '" + o.getMethodName(constantPoolGen) + "' with expected signature '"
@@ -600,8 +583,8 @@ public final class Pass3aVerifier extends PassVerifier {
                 // is therefore resolved/verified.
                 // INVOKESPECIAL is an InvokeInstruction, the argument and return types are resolved/verified,
                 // too. So are the allowed method names.
-                final String classname = o.getClassName(constantPoolGen);
-                final JavaClass jc = Repository.lookupClass(classname);
+                final String className = o.getClassName(constantPoolGen);
+                final JavaClass jc = Repository.lookupClass(className);
                 final Method m = getMethodRecursive(jc, o);
                 if (m == null) {
                     constraintViolated(o, "Referenced method '" + o.getMethodName(constantPoolGen) + "' with expected signature '"
@@ -624,7 +607,7 @@ public final class Pass3aVerifier extends PassVerifier {
                         for (final Method meth2 : meths) {
                             if (meth2.getName().equals(o.getMethodName(constantPoolGen))
                                 && Type.getReturnType(meth2.getSignature()).equals(o.getReturnType(constantPoolGen))
-                                && objarrayequals(Type.getArgumentTypes(meth2.getSignature()), o.getArgumentTypes(constantPoolGen))) {
+                                && Arrays.equals(Type.getArgumentTypes(meth2.getSignature()), o.getArgumentTypes(constantPoolGen))) {
                                 meth = meth2;
                                 break;
                             }
@@ -654,8 +637,8 @@ public final class Pass3aVerifier extends PassVerifier {
                 // is therefore resolved/verified.
                 // INVOKESTATIC is an InvokeInstruction, the argument and return types are resolved/verified,
                 // too. So are the allowed method names.
-                final String classname = o.getClassName(constantPoolGen);
-                final JavaClass jc = Repository.lookupClass(classname);
+                final String className = o.getClassName(constantPoolGen);
+                final JavaClass jc = Repository.lookupClass(className);
                 final Method m = getMethodRecursive(jc, o);
                 if (m == null) {
                     constraintViolated(o, "Referenced method '" + o.getMethodName(constantPoolGen) + "' with expected signature '"
@@ -678,8 +661,8 @@ public final class Pass3aVerifier extends PassVerifier {
                 // is therefore resolved/verified.
                 // INVOKEVIRTUAL is an InvokeInstruction, the argument and return types are resolved/verified,
                 // too. So are the allowed method names.
-                final String classname = o.getClassName(constantPoolGen);
-                final JavaClass jc = Repository.lookupClass(classname);
+                final String className = o.getClassName(constantPoolGen);
+                final JavaClass jc = Repository.lookupClass(className);
                 final Method m = getMethodRecursive(jc, o);
                 if (m == null) {
                     constraintViolated(o, "Referenced method '" + o.getMethodName(constantPoolGen) + "' with expected signature '"
@@ -703,7 +686,7 @@ public final class Pass3aVerifier extends PassVerifier {
             if (idx < 0) {
                 constraintViolated(o, "Index '" + idx + "' must be non-negative.");
             } else {
-                final int maxminus1 = max_locals() - 1;
+                final int maxminus1 = maxLocals() - 1;
                 if (idx > maxminus1) {
                     constraintViolated(o, "Index '" + idx + "' must not be greater than max_locals-1 '" + maxminus1 + "'.");
                 }
@@ -748,7 +731,7 @@ public final class Pass3aVerifier extends PassVerifier {
                 constraintViolated(o, "Index '" + idx + "' must be non-negative."
                     + " [Constraint by JustIce as an analogon to the single-slot xLOAD/xSTORE instructions; may not happen anyway.]");
             } else {
-                final int maxminus2 = max_locals() - 2;
+                final int maxminus2 = maxLocals() - 2;
                 if (idx > maxminus2) {
                     constraintViolated(o, "Index '" + idx + "' must not be greater than max_locals-2 '" + maxminus2 + "'.");
                 }
@@ -809,7 +792,7 @@ public final class Pass3aVerifier extends PassVerifier {
                 constraintViolated(o, "Index '" + idx + "' must be non-negative."
                     + " [Constraint by JustIce as an analogon to the single-slot xLOAD/xSTORE instructions; may not happen anyway.]");
             } else {
-                final int maxminus2 = max_locals() - 2;
+                final int maxminus2 = maxLocals() - 2;
                 if (idx > maxminus2) {
                     constraintViolated(o, "Index '" + idx + "' must not be greater than max_locals-2 '" + maxminus2 + "'.");
                 }
@@ -872,18 +855,18 @@ public final class Pass3aVerifier extends PassVerifier {
         @Override
         public void visitPUTSTATIC(final PUTSTATIC o) {
             try {
-                final String field_name = o.getFieldName(constantPoolGen);
+                final String fieldName = o.getFieldName(constantPoolGen);
                 final JavaClass jc = Repository.lookupClass(getObjectType(o).getClassName());
                 final Field[] fields = jc.getFields();
                 Field f = null;
                 for (final Field field : fields) {
-                    if (field.getName().equals(field_name)) {
+                    if (field.getName().equals(fieldName)) {
                         f = field;
                         break;
                     }
                 }
                 if (f == null) {
-                    throw new AssertionViolatedException("Field '" + field_name + "' not found in " + jc.getClassName());
+                    throw new AssertionViolatedException("Field '" + fieldName + "' not found in " + jc.getClassName());
                 }
 
                 if (f.isFinal() && !myOwner.getClassName().equals(getObjectType(o).getClassName())) {
@@ -895,10 +878,10 @@ public final class Pass3aVerifier extends PassVerifier {
                     constraintViolated(o, "Referenced field '" + f + "' is not static which it should be.");
                 }
 
-                final String meth_name = Repository.lookupClass(myOwner.getClassName()).getMethods()[methodNo].getName();
+                final String methName = Repository.lookupClass(myOwner.getClassName()).getMethods()[methodNo].getName();
 
                 // If it's an interface, it can be set only in <clinit>.
-                if (!jc.isClass() && !meth_name.equals(Const.STATIC_INITIALIZER_NAME)) {
+                if (!jc.isClass() && !methName.equals(Const.STATIC_INITIALIZER_NAME)) {
                     constraintViolated(o, "Interface field '" + f + "' must be set in a '" + Const.STATIC_INITIALIZER_NAME + "' method.");
                 }
             } catch (final ClassNotFoundException e) {
@@ -914,7 +897,7 @@ public final class Pass3aVerifier extends PassVerifier {
             if (idx < 0) {
                 constraintViolated(o, "Index '" + idx + "' must be non-negative.");
             } else {
-                final int maxminus1 = max_locals() - 1;
+                final int maxminus1 = maxLocals() - 1;
                 if (idx > maxminus1) {
                     constraintViolated(o, "Index '" + idx + "' must not be greater than max_locals-1 '" + maxminus1 + "'.");
                 }
@@ -987,7 +970,7 @@ public final class Pass3aVerifier extends PassVerifier {
         if (lnt != null) {
             final LineNumber[] lineNumbers = lnt.getLineNumberTable();
             final IntList offsets = new IntList();
-            lineNumber_loop: for (final LineNumber lineNumber : lineNumbers) { // may appear in any order.
+            lineNumberLoop: for (final LineNumber lineNumber : lineNumbers) { // may appear in any order.
                 for (final int instructionPosition : instructionPositions) {
                     // TODO: Make this a binary search! The instructionPositions array is naturally ordered!
                     final int offset = lineNumber.getStartPC();
@@ -998,7 +981,7 @@ public final class Pass3aVerifier extends PassVerifier {
                         } else {
                             offsets.add(offset);
                         }
-                        continue lineNumber_loop;
+                        continue lineNumberLoop;
                     }
                 }
                 throw new ClassConstraintException("Code attribute '" + tostring(code) + "' has a LineNumberTable attribute '" + code.getLineNumberTable()
