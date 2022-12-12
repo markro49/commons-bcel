@@ -13,7 +13,6 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *
  */
 package org.apache.bcel.verifier.statics;
 
@@ -32,8 +31,8 @@ public class LocalVariablesInfo {
     private final LocalVariableInfo[] localVariableInfos;
 
     /** The constructor. */
-    LocalVariablesInfo(final int max_locals) {
-        localVariableInfos = new LocalVariableInfo[max_locals];
+    LocalVariablesInfo(final int maxLocals) {
+        localVariableInfos = new LocalVariableInfo[maxLocals];
         Arrays.setAll(localVariableInfos, i -> new LocalVariableInfo());
     }
 
@@ -41,6 +40,7 @@ public class LocalVariablesInfo {
      * Adds information about the local variable in slot 'slot'. Automatically adds information for slot+1 if 't' is
      * Type.LONG or Type.DOUBLE.
      *
+     * @param slot Slot number for local variable information
      * @param name variable name
      * @param startPc Range in which the variable is valid.
      * @param length length of ...
@@ -48,7 +48,7 @@ public class LocalVariablesInfo {
      * @throws LocalVariableInfoInconsistentException if the new information conflicts with already gathered information.
      */
     public void add(final int slot, final String name, final int startPc, final int length, final Type type) throws LocalVariableInfoInconsistentException {
-        // The add operation on LocalVariableInfo may throw the '...Inconsistent...' exception, we don't throw it explicitely
+        // The add operation on LocalVariableInfo may throw the '...Inconsistent...' exception, we don't throw it explicitly
         // here.
 
         if (slot < 0 || slot >= localVariableInfos.length) {

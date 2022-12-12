@@ -13,15 +13,15 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *
  */
 package org.apache.bcel.generic;
+
+import java.util.Objects;
 
 import org.apache.bcel.Const;
 
 /**
  * Wrapper class for push operations, which are implemented either as BIPUSH, LDC or xCONST_n instructions.
- *
  */
 public final class PUSH implements CompoundInstruction, VariableLengthInstruction, InstructionConstants {
 
@@ -32,6 +32,7 @@ public final class PUSH implements CompoundInstruction, VariableLengthInstructio
      * @param value to be pushed
      */
     public PUSH(final ConstantPoolGen cp, final boolean value) {
+        Objects.requireNonNull(cp, "cp");
         instruction = InstructionConst.getInstruction(Const.ICONST_0 + (value ? 1 : 0));
     }
 

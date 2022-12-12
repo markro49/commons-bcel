@@ -13,7 +13,6 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *
  */
 package org.apache.bcel.generic;
 
@@ -25,7 +24,6 @@ import org.apache.bcel.util.ByteSequence;
 
 /**
  * Abstract super class for instructions dealing with local variables.
- *
  */
 public abstract class LocalVariableInstruction extends Instruction implements TypedInstruction, IndexedInstruction {
 
@@ -48,9 +46,9 @@ public abstract class LocalVariableInstruction extends Instruction implements Ty
      * Empty constructor needed for Instruction.readInstruction. Not to be used otherwise. tag and length are defined in
      * readInstruction and initFromFile, respectively.
      */
-    LocalVariableInstruction(final short canon_tag, final short c_tag) {
-        this.canonTag = canon_tag;
-        this.cTag = c_tag;
+    LocalVariableInstruction(final short canonTag, final short cTag) {
+        this.canonTag = canonTag;
+        this.cTag = cTag;
     }
 
     /**

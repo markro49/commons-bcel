@@ -13,7 +13,6 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *
  */
 package org.apache.bcel.classfile;
 
@@ -21,7 +20,6 @@ import org.apache.bcel.Const;
 
 /**
  * Super class for all objects that have modifiers like private, final, ... I.e. classes, fields, and methods.
- *
  */
 public abstract class AccessFlags {
 
@@ -35,7 +33,7 @@ public abstract class AccessFlags {
     }
 
     /**
-     * @param a inital access flags
+     * @param a initial access flags
      */
     public AccessFlags(final int a) {
         access_flags = a;
@@ -186,10 +184,10 @@ public abstract class AccessFlags {
     /**
      * Set access flags aka "modifiers".
      *
-     * @param access_flags Access flags of the object.
+     * @param accessFlags Access flags of the object.
      */
-    public final void setAccessFlags(final int access_flags) {
-        this.access_flags = access_flags;
+    public final void setAccessFlags(final int accessFlags) {
+        this.access_flags = accessFlags;
     }
 
     private void setFlag(final int flag, final boolean set) {
@@ -205,9 +203,9 @@ public abstract class AccessFlags {
     /**
      * Set access flags aka "modifiers".
      *
-     * @param access_flags Access flags of the object.
+     * @param accessFlags Access flags of the object.
      */
-    public final void setModifiers(final int access_flags) {
-        setAccessFlags(access_flags);
+    public final void setModifiers(final int accessFlags) {
+        setAccessFlags(accessFlags);
     }
 }

@@ -13,7 +13,6 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *
  */
 package org.apache.bcel.classfile;
 
@@ -50,9 +49,9 @@ public final class ConstantMethodType extends Constant {
         this(file.readUnsignedShort());
     }
 
-    public ConstantMethodType(final int descriptor_index) {
+    public ConstantMethodType(final int descriptorIndex) {
         super(Const.CONSTANT_MethodType);
-        this.descriptorIndex = descriptor_index;
+        this.descriptorIndex = descriptorIndex;
     }
 
     /**
@@ -82,8 +81,8 @@ public final class ConstantMethodType extends Constant {
         return descriptorIndex;
     }
 
-    public void setDescriptorIndex(final int descriptor_index) {
-        this.descriptorIndex = descriptor_index;
+    public void setDescriptorIndex(final int descriptorIndex) {
+        this.descriptorIndex = descriptorIndex;
     }
 
     /**

@@ -13,7 +13,6 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *
  */
 package org.apache.bcel.classfile;
 
@@ -41,32 +40,32 @@ public final class StackMap extends Attribute {
     /**
      * Construct object from input stream.
      *
-     * @param name_index Index of name
+     * @param nameIndex Index of name
      * @param length Content length in bytes
      * @param input Input stream
-     * @param constant_pool Array of constants
+     * @param constantPool Array of constants
      * @throws IOException if an I/O error occurs.
      */
-    StackMap(final int name_index, final int length, final DataInput input, final ConstantPool constant_pool) throws IOException {
-        this(name_index, length, (StackMapEntry[]) null, constant_pool);
-        final int map_length = input.readUnsignedShort();
-        table = new StackMapEntry[map_length];
-        for (int i = 0; i < map_length; i++) {
-            table[i] = new StackMapEntry(input, constant_pool);
+    StackMap(final int nameIndex, final int length, final DataInput input, final ConstantPool constantPool) throws IOException {
+        this(nameIndex, length, (StackMapEntry[]) null, constantPool);
+        final int mapLength = input.readUnsignedShort();
+        table = new StackMapEntry[mapLength];
+        for (int i = 0; i < mapLength; i++) {
+            table[i] = new StackMapEntry(input, constantPool);
         }
     }
 
     /*
-     * @param name_index Index of name
+     * @param nameIndex Index of name
      *
      * @param length Content length in bytes
      *
      * @param map Table of stack map entries
      *
-     * @param constant_pool Array of constants
+     * @param constantPool Array of constants
      */
-    public StackMap(final int name_index, final int length, final StackMapEntry[] map, final ConstantPool constant_pool) {
-        super(Const.ATTR_STACK_MAP, name_index, length, constant_pool);
+    public StackMap(final int nameIndex, final int length, final StackMapEntry[] map, final ConstantPool constantPool) {
+        super(Const.ATTR_STACK_MAP, nameIndex, length, constantPool);
         this.table = map;
     }
 
@@ -137,10 +136,10 @@ public final class StackMap extends Attribute {
     @Override
     public String toString() {
         final StringBuilder buf = new StringBuilder("StackMap(");
-        int running_offset = -1; // no +1 on first entry
+        int runningOffset = -1; // no +1 on first entry
         for (int i = 0; i < table.length; i++) {
-            running_offset = table[i].getByteCodeOffset() + running_offset + 1;
-            buf.append(String.format("%n@%03d %s", running_offset, table[i]));
+            runningOffset = table[i].getByteCodeOffset() + runningOffset + 1;
+            buf.append(String.format("%n@%03d %s", runningOffset, table[i]));
             if (i < table.length - 1) {
                 buf.append(", ");
             }
