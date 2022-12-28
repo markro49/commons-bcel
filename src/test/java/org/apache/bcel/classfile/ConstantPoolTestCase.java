@@ -118,26 +118,6 @@ public class ConstantPoolTestCase extends AbstractTestCase {
     }
 
     @Test
-    public void testDoubleConstantWontThrowClassFormatException() throws ClassNotFoundException, IOException {
-        try (final ClassPath cp = new ClassPath("target/test-classes/org/apache/bcel/classfile")) {
-            final JavaClass c = new ClassPathRepository(cp).loadClass("ClassWithDoubleConstantPoolItem");
-
-            final ConstantPool pool = c.getConstantPool();
-            IntStream.range(0, pool.getLength()).forEach(i -> assertDoesNotThrow(() -> pool.getConstant(i)));
-        }
-    }
-
-    @Test
-    public void testLongConstantWontThrowClassFormatException() throws ClassNotFoundException, IOException {
-        try (final ClassPath cp = new ClassPath("target/test-classes/org/apache/bcel/classfile")) {
-            final JavaClass c = new ClassPathRepository(cp).loadClass("ClassWithLongConstantPoolItem");
-
-            final ConstantPool pool = c.getConstantPool();
-            IntStream.range(0, pool.getLength()).forEach(i -> assertDoesNotThrow(() -> pool.getConstant(i)));
-        }
-    }
-
-    @Test
     public void testTooManyConstants() throws ClassNotFoundException {
         final JavaClass clazz = getTestJavaClass(PACKAGE_BASE_NAME + ".data.SimpleClassWithDefaultConstructor");
         final ConstantPoolGen cp = new ConstantPoolGen(clazz.getConstantPool());
