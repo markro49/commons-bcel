@@ -399,10 +399,10 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>taglist-maven-plugin</artifactId>
-        <version>3.0.0</version>
-        <configuration>
+         <groupId>org.codehaus.mojo</groupId>
+         <artifactId>taglist-maven-plugin</artifactId>
+         <version>3.0.0</version>
+         <configuration>
           <tags>
             <tag>TODO</tag>
             <tag>NOPMD</tag>

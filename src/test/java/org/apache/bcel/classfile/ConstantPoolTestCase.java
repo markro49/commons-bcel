@@ -24,9 +24,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 
-import java.io.IOException;
-import java.util.stream.IntStream;
-
 import org.apache.bcel.AbstractTestCase;
 import org.apache.bcel.Const;
 import org.apache.bcel.generic.ConstantPoolGen;
