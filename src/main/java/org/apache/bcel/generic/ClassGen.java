@@ -38,7 +38,7 @@ import org.apache.bcel.util.BCELComparator;
 import org.apache.commons.lang3.ArrayUtils;
 
 /**
- * Template class for building up a java class. May be initialized with an existing java class (file).
+ * Template class for building up a java class. May be initialized with an existing Java class (file).
  *
  * @see JavaClass
  */
@@ -239,7 +239,7 @@ public class ClassGen extends AccessFlags implements Cloneable {
         try {
             return super.clone();
         } catch (final CloneNotSupportedException e) {
-            throw new Error("Clone Not Supported"); // never happens
+            throw new UnsupportedOperationException("Clone Not Supported", e); // never happens
         }
     }
 
@@ -376,7 +376,7 @@ public class ClassGen extends AccessFlags implements Cloneable {
     }
 
     /**
-     * Return value as defined by given BCELComparator strategy. By default return the hashcode of the class name.
+     * Return value as defined by given BCELComparator strategy. By default return the hash code of the class name.
      *
      * @see Object#hashCode()
      */
@@ -475,7 +475,7 @@ public class ClassGen extends AccessFlags implements Cloneable {
     }
 
     /**
-     * Set major version number of class file, default value is 45 (JDK 1.1)
+     * Sets major version number of class file, default value is 45 (JDK 1.1)
      *
      * @param major major version number
      */
@@ -493,7 +493,7 @@ public class ClassGen extends AccessFlags implements Cloneable {
     }
 
     /**
-     * Set minor version number of class file, default value is 3 (JDK 1.1)
+     * Sets minor version number of class file, default value is 3 (JDK 1.1)
      *
      * @param minor minor version number
      */

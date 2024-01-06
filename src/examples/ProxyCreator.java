@@ -34,7 +34,7 @@ import org.apache.bcel.generic.PUSH;
 import org.apache.bcel.generic.Type;
 
 /**
- * Dynamically creates and uses a proxy for {@code java.awt.event.ActionListener} via the classloader mechanism if
+ * Dynamically creates and uses a proxy for {@code java.awt.event.ActionListener} via the class loader mechanism if
  * called with
  *
  * <pre>
@@ -59,7 +59,7 @@ public class ProxyCreator {
     public static Object createProxy(final String pack, final String className) {
         try {
             final Class<?> cl = Class.forName(pack + "$$BCEL$$" + className);
-            return cl.newInstance();
+            return cl.getConstructor().newInstance();
         } catch (final Exception e) {
             e.printStackTrace();
         }

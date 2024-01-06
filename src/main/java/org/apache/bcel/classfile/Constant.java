@@ -142,7 +142,7 @@ public abstract class Constant implements Cloneable, Node {
         try {
             return super.clone();
         } catch (final CloneNotSupportedException e) {
-            throw new Error("Clone Not Supported"); // never happens
+            throw new UnsupportedOperationException("Clone Not Supported", e); // never happens
         }
     }
 
@@ -179,7 +179,7 @@ public abstract class Constant implements Cloneable, Node {
     }
 
     /**
-     * Returns value as defined by given BCELComparator strategy. By default return the hashcode of the result of
+     * Returns value as defined by given BCELComparator strategy. By default return the hash code of the result of
      * toString().
      *
      * @see Object#hashCode()
