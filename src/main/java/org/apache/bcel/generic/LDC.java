@@ -108,7 +108,7 @@ public class LDC extends CPInstruction implements PushInstruction, ExceptionThro
         case org.apache.bcel.Const.CONSTANT_Class:
             final int nameIndex = ((org.apache.bcel.classfile.ConstantClass) c).getNameIndex();
             c = cpg.getConstantPool().getConstant(nameIndex);
-            return Type.getType(((org.apache.bcel.classfile.ConstantUtf8) c).getBytes());
+            return Type.getType(Type.internalTypeNameToSignature(((org.apache.bcel.classfile.ConstantUtf8) c).getBytes()));
         default: // Never reached
             throw new IllegalArgumentException("Unknown or invalid constant type at " + super.getIndex());
         }
@@ -124,7 +124,7 @@ public class LDC extends CPInstruction implements PushInstruction, ExceptionThro
     }
 
     /**
-     * Set the index to constant pool and adjust size.
+     * Sets the index to constant pool and adjust size.
      */
     @Override
     public final void setIndex(final int index) {

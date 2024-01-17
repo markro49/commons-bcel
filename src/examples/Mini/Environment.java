@@ -48,7 +48,7 @@ public class Environment implements Cloneable {
     private final int size; // The table is an array of
     private final Vector<EnvEntry>[] table; // Vectors
 
-    private int elements = 0;
+    private int elements;
 
     public Environment() {
         this(SIZE);
@@ -76,7 +76,7 @@ public class Environment implements Cloneable {
                  * int len = table[i].size();
                  *
                  * copy[i] = new Vector(len); try { for(int j=0; j < len; j++) copy[i].addElement(table[i].elementAt(j)); }
-                 * catch(ArrayIndexOutOfBoundsException e) {}
+                 * catch (ArrayIndexOutOfBoundsException e) {}
                  */
             }
         }
@@ -110,7 +110,7 @@ public class Environment implements Cloneable {
     }
 
     /**
-     * Get entry from hash table.
+     * Gets entry from hash table.
      */
     public EnvEntry get(final String key) {
         int hash;

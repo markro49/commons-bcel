@@ -146,7 +146,7 @@ public class ClassPath implements Closeable {
 
         /**
          * @return base path of found class, i.e. class is contained relative to that path, which may either denote a directory,
-         *         or zip file
+         *         or ZIP file
          */
         String getBase();
 
@@ -172,7 +172,7 @@ public class ClassPath implements Closeable {
         long getTime();
     }
 
-    private static class Dir extends AbstractPathEntry {
+    private static final class Dir extends AbstractPathEntry {
 
         private final String dir;
 
@@ -254,7 +254,7 @@ public class ClassPath implements Closeable {
         }
     }
 
-    private static class Jar extends AbstractZip {
+    private static final class Jar extends AbstractZip {
 
         Jar(final ZipFile zip) {
             super(zip);
@@ -267,7 +267,7 @@ public class ClassPath implements Closeable {
 
     }
 
-    private static class JrtModule extends AbstractPathEntry {
+    private static final class JrtModule extends AbstractPathEntry {
 
         private final Path modulePath;
 
@@ -350,7 +350,7 @@ public class ClassPath implements Closeable {
 
     }
 
-    private static class JrtModules extends AbstractPathEntry {
+    private static final class JrtModules extends AbstractPathEntry {
 
         private final ModularRuntimeImage modularRuntimeImage;
         private final JrtModule[] modules;
@@ -416,7 +416,7 @@ public class ClassPath implements Closeable {
 
     }
 
-    private static class Module extends AbstractZip {
+    private static final class Module extends AbstractZip {
 
         Module(final ZipFile zip) {
             super(zip);
@@ -635,7 +635,7 @@ public class ClassPath implements Closeable {
     /**
      * @param name fully qualified file name, e.g. java/lang/String
      * @param suffix file name ends with suff, e.g. .java
-     * @return class file for the java class
+     * @return class file for the Java class
      * @throws IOException if an I/O error occurs.
      */
     public ClassFile getClassFile(final String name, final String suffix) throws IOException {

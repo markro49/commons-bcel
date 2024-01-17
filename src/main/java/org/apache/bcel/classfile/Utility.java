@@ -48,7 +48,7 @@ public abstract class Utility {
     /**
      * Decode characters into bytes. Used by <a href="Utility.html#decode(java.lang.String, boolean)">decode()</a>
      */
-    private static class JavaReader extends FilterReader {
+    private static final class JavaReader extends FilterReader {
 
         public JavaReader(final Reader in) {
             super(in);
@@ -85,10 +85,10 @@ public abstract class Utility {
     }
 
     /**
-     * Encode bytes into valid java identifier characters. Used by
+     * Encode bytes into valid Java identifier characters. Used by
      * <a href="Utility.html#encode(byte[], boolean)">encode()</a>
      */
-    private static class JavaWriter extends FilterWriter {
+    private static final class JavaWriter extends FilterWriter {
 
         public JavaWriter(final Writer out) {
             super(out);
@@ -432,7 +432,9 @@ public abstract class Utility {
         case Const.NEW:
         case Const.CHECKCAST:
             buf.append("\t");
-            //$FALL-THROUGH$
+            index = bytes.readUnsignedShort();
+            buf.append("\t<").append(constantPool.constantToString(index, Const.CONSTANT_Class)).append(">").append(verbose ? " (" + index + ")" : "");
+            break;
         case Const.INSTANCEOF:
             index = bytes.readUnsignedShort();
             buf.append("\t<").append(constantPool.constantToString(index, Const.CONSTANT_Class)).append(">").append(verbose ? " (" + index + ")" : "");
@@ -859,7 +861,7 @@ public abstract class Utility {
             // Skip any type arguments to read argument declarations between '(' and ')'
             index = signature.indexOf('(') + 1;
             if (index <= 0) {
-                throw new ClassFormatException("Invalid method signature: " + signature);
+                throw new InvalidMethodSignatureException(signature);
             }
             while (signature.charAt(index) != ')') {
                 vec.add(typeSignatureToString(signature.substring(index), chopit));
@@ -867,7 +869,7 @@ public abstract class Utility {
                 index += unwrap(CONSUMER_CHARS); // update position
             }
         } catch (final StringIndexOutOfBoundsException e) { // Should never occur
-            throw new ClassFormatException("Invalid method signature: " + signature, e);
+            throw new InvalidMethodSignatureException(signature, e);
         }
         return vec.toArray(ArrayUtils.EMPTY_STRING_ARRAY);
     }
@@ -898,11 +900,11 @@ public abstract class Utility {
             // Read return type after ')'
             index = signature.lastIndexOf(')') + 1;
             if (index <= 0) {
-                throw new ClassFormatException("Invalid method signature: " + signature);
+                throw new InvalidMethodSignatureException(signature);
             }
             type = typeSignatureToString(signature.substring(index), chopit);
         } catch (final StringIndexOutOfBoundsException e) { // Should never occur
-            throw new ClassFormatException("Invalid method signature: " + signature, e);
+            throw new InvalidMethodSignatureException(signature, e);
         }
         return type;
     }
@@ -954,7 +956,7 @@ public abstract class Utility {
             // Skip any type arguments to read argument declarations between '(' and ')'
             index = signature.indexOf('(') + 1;
             if (index <= 0) {
-                throw new ClassFormatException("Invalid method signature: " + signature);
+                throw new InvalidMethodSignatureException(signature);
             }
             while (signature.charAt(index) != ')') {
                 final String paramType = typeSignatureToString(signature.substring(index), chopit);
@@ -980,7 +982,7 @@ public abstract class Utility {
             // Read return type after ')'
             type = typeSignatureToString(signature.substring(index), chopit);
         } catch (final StringIndexOutOfBoundsException e) { // Should never occur
-            throw new ClassFormatException("Invalid method signature: " + signature, e);
+            throw new InvalidMethodSignatureException(signature, e);
         }
         // ignore any throws information in the signature
         if (buf.length() > 1) {
@@ -1232,12 +1234,12 @@ public abstract class Utility {
         int index;
         try {
             if (signature.charAt(0) != '(') {
-                throw new ClassFormatException("Invalid method signature: " + signature);
+                throw new InvalidMethodSignatureException(signature);
             }
             index = signature.lastIndexOf(')') + 1;
             return typeOfSignature(signature.substring(index));
         } catch (final StringIndexOutOfBoundsException e) {
-            throw new ClassFormatException("Invalid method signature: " + signature, e);
+            throw new InvalidMethodSignatureException(signature, e);
         }
     }
 
@@ -1281,10 +1283,10 @@ public abstract class Utility {
             case '*':
                 return typeOfSignature(signature.substring(1));
             default:
-                throw new ClassFormatException("Invalid method signature: " + signature);
+                throw new InvalidMethodSignatureException(signature);
             }
         } catch (final StringIndexOutOfBoundsException e) {
-            throw new ClassFormatException("Invalid method signature: " + signature, e);
+            throw new InvalidMethodSignatureException(signature, e);
         }
     }
 

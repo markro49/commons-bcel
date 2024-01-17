@@ -73,7 +73,7 @@ public final class Field extends FieldOrMethod {
     }
 
     /**
-     * Construct object from file stream.
+     * Constructs object from file stream.
      *
      * @param file Input stream
      */
@@ -144,14 +144,16 @@ public final class Field extends FieldOrMethod {
     }
 
     /**
+     * See https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.2.2
+     *
      * @return type of field
      */
     public Type getType() {
-        return Type.getReturnType(getSignature());
+        return Type.getType(getSignature());
     }
 
     /**
-     * Return value as defined by given BCELComparator strategy. By default return the hashcode of the field's name XOR
+     * Return value as defined by given BCELComparator strategy. By default return the hash code of the field's name XOR
      * signature.
      *
      * @see Object#hashCode()

@@ -187,7 +187,7 @@ public class FieldGen extends FieldGenOrMethodGen {
     }
 
     /**
-     * Get field object after having set up all necessary values.
+     * Gets field object after having set up all necessary values.
      */
     public Field getField() {
         final String signature = getSignature();
@@ -203,10 +203,7 @@ public class FieldGen extends FieldGenOrMethodGen {
     }
 
     public String getInitValue() {
-        if (value != null) {
-            return value.toString();
-        }
-        return null;
+        return Objects.toString(value, null);
     }
 
     @Override
@@ -215,7 +212,7 @@ public class FieldGen extends FieldGenOrMethodGen {
     }
 
     /**
-     * Return value as defined by given BCELComparator strategy. By default return the hashcode of the field's name XOR
+     * Return value as defined by given BCELComparator strategy. By default return the hash code of the field's name XOR
      * signature.
      *
      * @see Object#hashCode()
@@ -291,7 +288,7 @@ public class FieldGen extends FieldGenOrMethodGen {
     }
 
     /**
-     * Set (optional) initial value of field, otherwise it will be set to null/0/false by the JVM automatically.
+     * Sets (optional) initial value of field, otherwise it will be set to null/0/false by the JVM automatically.
      */
     public void setInitValue(final String str) {
         checkType(ObjectType.getInstance("java.lang.String"));

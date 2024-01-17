@@ -787,7 +787,7 @@ public class MethodGen extends FieldGenOrMethodGen {
     }
 
     /**
-     * Get method object. Never forget to call setMaxStack() or setMaxStack(max), respectively, before calling this method
+     * Gets method object. Never forget to call setMaxStack() or setMaxStack(max), respectively, before calling this method
      * (the same applies for max locals).
      *
      * @return method object
@@ -885,7 +885,7 @@ public class MethodGen extends FieldGenOrMethodGen {
     }
 
     /**
-     * Return value as defined by given BCELComparator strategy. By default return the hashcode of the method's name XOR
+     * Return value as defined by given BCELComparator strategy. By default return the hash code of the method's name XOR
      * signature.
      *
      * @see Object#hashCode()
@@ -1083,7 +1083,7 @@ public class MethodGen extends FieldGenOrMethodGen {
     }
 
     /**
-     * Set maximum number of local variables.
+     * Sets maximum number of local variables.
      */
     public void setMaxLocals(final int m) {
         maxLocals = m;
@@ -1101,7 +1101,7 @@ public class MethodGen extends FieldGenOrMethodGen {
     }
 
     /**
-     * Set maximum stack size for this method.
+     * Sets maximum stack size for this method.
      */
     public void setMaxStack(final int m) { // TODO could be package-protected?
         maxStack = m;
