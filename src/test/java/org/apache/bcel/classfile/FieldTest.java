@@ -14,20 +14,25 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.bcel.verifier.structurals;
 
-import java.io.Serializable;
+package org.apache.bcel.classfile;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 
 /**
- * A placeholder class that can be used to create an ObjectType of which has some of the properties arrays have. They
- * implement {@link Cloneable} and {@link java.io.Serializable} and they extend {@link Object}.
+ * Tests {@link Field}.
  */
-public class GenericArray implements Cloneable, Serializable {
+public class FieldTest {
 
-    private static final long serialVersionUID = 1991183963515237894L;
-
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    @Test
+    public void testBCELComparator() throws Exception {
+        final Field obj = new Field(1, 1, 1, null, null);
+        assertTrue(Field.getComparator().equals(null, null));
+        assertTrue(Field.getComparator().equals(obj, obj));
+        assertFalse(Field.getComparator().equals(obj, null));
+        assertFalse(Field.getComparator().equals(null, obj));
     }
 }

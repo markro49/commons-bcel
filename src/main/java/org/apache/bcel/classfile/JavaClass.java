@@ -65,19 +65,17 @@ public class JavaClass extends AccessFlags implements Cloneable, Node, Comparabl
     public static final byte FILE = 2;
     public static final byte ZIP = 3;
     private static final boolean debug = Boolean.getBoolean("JavaClass.debug"); // Debugging on/off
-    private static BCELComparator bcelComparator = new BCELComparator() {
+
+    private static BCELComparator<JavaClass> bcelComparator = new BCELComparator<JavaClass>() {
 
         @Override
-        public boolean equals(final Object o1, final Object o2) {
-            final JavaClass THIS = (JavaClass) o1;
-            final JavaClass THAT = (JavaClass) o2;
-            return Objects.equals(THIS.getClassName(), THAT.getClassName());
+        public boolean equals(final JavaClass a, final JavaClass b) {
+            return a == b || a != null && b != null && Objects.equals(a.getClassName(), b.getClassName());
         }
 
         @Override
-        public int hashCode(final Object o) {
-            final JavaClass THIS = (JavaClass) o;
-            return THIS.getClassName().hashCode();
+        public int hashCode(final JavaClass o) {
+            return o != null ? Objects.hashCode(o.getClassName()) : 0;
         }
     };
 
@@ -91,9 +89,9 @@ public class JavaClass extends AccessFlags implements Cloneable, Node, Comparabl
     }
 
     /**
-     * @return Comparison strategy object
+     * @return Comparison strategy object.
      */
-    public static BCELComparator getComparator() {
+    public static BCELComparator<JavaClass> getComparator() {
         return bcelComparator;
     }
 
@@ -107,9 +105,9 @@ public class JavaClass extends AccessFlags implements Cloneable, Node, Comparabl
     }
 
     /**
-     * @param comparator Comparison strategy object
+     * @param comparator Comparison strategy object.
      */
-    public static void setComparator(final BCELComparator comparator) {
+    public static void setComparator(final BCELComparator<JavaClass> comparator) {
         bcelComparator = comparator;
     }
 
@@ -391,7 +389,7 @@ public class JavaClass extends AccessFlags implements Cloneable, Node, Comparabl
      */
     @Override
     public boolean equals(final Object obj) {
-        return bcelComparator.equals(this, obj);
+        return obj instanceof JavaClass && bcelComparator.equals(this, (JavaClass) obj);
     }
 
     /**
@@ -634,7 +632,7 @@ public class JavaClass extends AccessFlags implements Cloneable, Node, Comparabl
     }
 
     /**
-     * @return the superclass for this JavaClass object, or null if this is java.lang.Object
+     * @return the superclass for this JavaClass object, or null if this is {@link Object}
      * @throws ClassNotFoundException if the superclass can't be found
      */
     public JavaClass getSuperClass() throws ClassNotFoundException {
@@ -658,8 +656,8 @@ public class JavaClass extends AccessFlags implements Cloneable, Node, Comparabl
     }
 
     /**
-     * returns the super class name of this class. In the case that this class is java.lang.Object, it will return itself
-     * (java.lang.Object). This is probably incorrect but isn't fixed at this time to not break existing clients.
+     * returns the super class name of this class. In the case that this class is {@link Object}, it will return itself
+     * ({@link Object}). This is probably incorrect but isn't fixed at this time to not break existing clients.
      *
      * @return Superclass name.
      */
