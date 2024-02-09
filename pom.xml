@@ -175,6 +175,7 @@
             <!-- Takes rather a long time (especially rt.jar) ; only needs to be done occasionally -->
             <exclude>**/JDKClassDumpTestCase.java</exclude>
           </excludes>
+          <runOrder>alphabetical</runOrder>
         </configuration>
       </plugin>
       <plugin>
