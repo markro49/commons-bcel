@@ -31,6 +31,7 @@ import org.apache.bcel.Const;
 import org.apache.bcel.classfile.Constant;
 import org.apache.bcel.util.ByteSequence;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.stream.Streams;
 
 /**
  * This class is a container for a list of <a href="Instruction.html">Instruction</a> objects. Instructions can be
@@ -57,23 +58,25 @@ public class InstructionList implements Iterable<InstructionHandle> {
      * @return target position's instruction handle if available
      */
     public static InstructionHandle findHandle(final InstructionHandle[] ihs, final int[] pos, final int count, final int target) {
-        int l = 0;
-        int r = count - 1;
-        /*
-         * Do a binary search since the pos array is orderd.
-         */
-        do {
-            final int i = l + r >>> 1;
-            final int j = pos[i];
-            if (j == target) {
-                return ihs[i];
-            }
-            if (target < j) {
-                r = i - 1;
-            } else {
-                l = i + 1;
-            }
-        } while (l <= r);
+        if (ihs != null && pos != null) {
+            int l = 0;
+            int r = count - 1;
+            /*
+             * Do a binary search since the pos array is orderd.
+             */
+            do {
+                final int i = l + r >>> 1;
+                final int j = pos[i];
+                if (j == target) {
+                    return ihs[i];
+                }
+                if (target < j) {
+                    r = i - 1;
+                } else {
+                    l = i + 1;
+                }
+            } while (l <= r);
+        }
         return null;
     }
 
@@ -956,7 +959,7 @@ public class InstructionList implements Iterable<InstructionHandle> {
      * @see MethodGen
      */
     public void redirectExceptionHandlers(final CodeExceptionGen[] exceptions, final InstructionHandle oldTarget, final InstructionHandle newTarget) {
-        for (final CodeExceptionGen exception : exceptions) {
+        Streams.of(exceptions).forEach(exception -> {
             if (exception.getStartPC() == oldTarget) {
                 exception.setStartPC(newTarget);
             }
@@ -966,7 +969,7 @@ public class InstructionList implements Iterable<InstructionHandle> {
             if (exception.getHandlerPC() == oldTarget) {
                 exception.setHandlerPC(newTarget);
             }
-        }
+        });
     }
 
     /**
@@ -978,16 +981,14 @@ public class InstructionList implements Iterable<InstructionHandle> {
      * @see MethodGen
      */
     public void redirectLocalVariables(final LocalVariableGen[] lg, final InstructionHandle oldTarget, final InstructionHandle newTarget) {
-        for (final LocalVariableGen element : lg) {
-            final InstructionHandle start = element.getStart();
-            final InstructionHandle end = element.getEnd();
-            if (start == oldTarget) {
+        Streams.of(lg).forEach(element -> {
+            if (element.getStart() == oldTarget) {
                 element.setStart(newTarget);
             }
-            if (end == oldTarget) {
+            if (element.getEnd() == oldTarget) {
                 element.setEnd(newTarget);
             }
-        }
+        });
     }
 
     /**

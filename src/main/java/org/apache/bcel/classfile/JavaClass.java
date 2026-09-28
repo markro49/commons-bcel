@@ -133,8 +133,10 @@ public class JavaClass extends AccessFlags implements Cloneable, Node, Comparabl
     private boolean isAnonymous;
 
     private boolean isNested;
+    private boolean isRecord;
 
     private boolean computedNestedTypeStatus;
+    private boolean computedRecord;
 
     /**
      * In cases where we go ahead and create something, use the default SyntheticRepository, because we don't know any
@@ -182,17 +184,15 @@ public class JavaClass extends AccessFlags implements Cloneable, Node, Comparabl
     public JavaClass(final int classNameIndex, final int superclassNameIndex, final String fileName, final int major, final int minor, final int accessFlags,
         final ConstantPool constantPool, int[] interfaces, Field[] fields, Method[] methods, Attribute[] attributes, final byte source) {
         super(accessFlags);
-        if (interfaces == null) {
-            interfaces = ArrayUtils.EMPTY_INT_ARRAY;
-        }
+        interfaces = ArrayUtils.nullToEmpty(interfaces);
         if (attributes == null) {
             attributes = Attribute.EMPTY_ARRAY;
         }
         if (fields == null) {
-            fields = Field.EMPTY_FIELD_ARRAY;
+            fields = Field.EMPTY_ARRAY;
         }
         if (methods == null) {
-            methods = Method.EMPTY_METHOD_ARRAY;
+            methods = Method.EMPTY_ARRAY;
         }
         this.classNameIndex = classNameIndex;
         this.superclassNameIndex = superclassNameIndex;
@@ -257,6 +257,19 @@ public class JavaClass extends AccessFlags implements Cloneable, Node, Comparabl
     @Override
     public int compareTo(final JavaClass obj) {
         return getClassName().compareTo(obj.getClassName());
+    }
+
+    private void computeIsRecord() {
+        if (computedRecord) {
+            return;
+        }
+        for (final Attribute attribute : this.attributes) {
+            if (attribute instanceof Record) {
+                isRecord = true;
+                break;
+            }
+        }
+        this.computedRecord = true;
     }
 
     private void computeNestedTypeStatus() {
@@ -743,6 +756,17 @@ public class JavaClass extends AccessFlags implements Cloneable, Node, Comparabl
         return this.isNested;
     }
 
+    /**
+     * Tests whether this class was declared as a record
+     *
+     * @return true if a record attribute is present, false otherwise.
+     * @since 6.9.0
+     */
+    public boolean isRecord() {
+        computeIsRecord();
+        return this.isRecord;
+    }
+
     public final boolean isSuper() {
         return (super.getAccessFlags() & Const.ACC_SUPER) != 0;
     }
@@ -751,7 +775,7 @@ public class JavaClass extends AccessFlags implements Cloneable, Node, Comparabl
      * @param attributes .
      */
     public void setAttributes(final Attribute[] attributes) {
-        this.attributes = attributes;
+        this.attributes = attributes != null ? attributes : Attribute.EMPTY_ARRAY;
     }
 
     /**
@@ -779,7 +803,7 @@ public class JavaClass extends AccessFlags implements Cloneable, Node, Comparabl
      * @param fields .
      */
     public void setFields(final Field[] fields) {
-        this.fields = fields;
+        this.fields = fields != null ? fields : Field.EMPTY_ARRAY;
     }
 
     /**
@@ -793,14 +817,14 @@ public class JavaClass extends AccessFlags implements Cloneable, Node, Comparabl
      * @param interfaceNames .
      */
     public void setInterfaceNames(final String[] interfaceNames) {
-        this.interfaceNames = interfaceNames;
+        this.interfaceNames = ArrayUtils.nullToEmpty(interfaceNames);
     }
 
     /**
      * @param interfaces .
      */
     public void setInterfaces(final int[] interfaces) {
-        this.interfaces = interfaces;
+        this.interfaces = ArrayUtils.nullToEmpty(interfaces);
     }
 
     /**
@@ -814,7 +838,7 @@ public class JavaClass extends AccessFlags implements Cloneable, Node, Comparabl
      * @param methods .
      */
     public void setMethods(final Method[] methods) {
-        this.methods = methods;
+        this.methods = methods != null ? methods : Method.EMPTY_ARRAY;
     }
 
     /**
